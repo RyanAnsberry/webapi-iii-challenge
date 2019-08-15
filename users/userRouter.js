@@ -16,9 +16,10 @@ router.post('/',validateUser ,(req, res) => {
 });
 
 router.post('/:id/posts', validatePost, (req, res) => {
-    const { userId, text } = req.body;
+    const { text } = req.body;
+    const user_id = req.params.id;
     posts
-      .insert({ userId, text })
+      .insert({ user_id, text })
       .then(post => {
         res.json(post);
       })
@@ -91,7 +92,7 @@ function validateUserId(req, res, next) {
 
     db.getById(id)
     .then(user => {
-        if (user) {
+        if (user.name && user.id) {
             next();
         } else {
             res.status(400).json({ message: 'Invalid user id' });
@@ -131,10 +132,11 @@ function validateUser(req, res, next) {
   };
 
 function validatePost(req, res, next) {
-    const { postBody }= req.body;
-    if(!postBody) {
+    const { text }= req.body;
+    console.log('req.body', req.body, 'text', text)
+    if(!req.body) {
         res.status(400).json({ message: "missing post data" });
-    } else if (!postBody.name) {
+    } else if (!text) {
         res.status(400).json({ message: "missing required text field" });
     } else {
         next();
